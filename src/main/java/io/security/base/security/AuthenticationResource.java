@@ -1,5 +1,6 @@
 package io.security.base.security;
 
+import com.auth0.jwt.interfaces.DecodedJWT;
 import io.security.base.role.RoleRepository;
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
@@ -18,6 +19,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -69,9 +72,7 @@ public class AuthenticationResource {
         }
 
         final JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setAccessToken(jwtTokenService.generateToken(userDetails, "direct", null));
-        return authenticationResponse;
+        return buildAuthenticationResponse(userDetails, "direct", null, null);
     }
 
     private AuthenticationResponse synchronizeUserAndGetToken(final String loginType,
@@ -92,8 +93,43 @@ public class AuthenticationResource {
 
         final JwtUserDetails userDetails = jwtSocialUserDetailsService.loadUserByUsername(subject);
         final Duration validity = Duration.between(Instant.now(), expiresAt);
+        return buildAuthenticationResponse(userDetails, loginType, validity, null);
+    }
+
+    @PostMapping("/refresh-token")
+    public AuthenticationResponse refreshToken(@RequestBody @Valid final RefreshTokenRequest refreshTokenRequest) {
+        final DecodedJWT refreshTokenJwt = jwtTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+        if (refreshTokenJwt == null || refreshTokenJwt.getSubject() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        final String loginType = refreshTokenJwt.getClaim("login_type").asString();
+        if (loginType == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        final UserDetails userDetails;
+        try {
+            if ("direct".equals(loginType)) {
+                userDetails = jwtUserDetailsService.loadUserByUsername(refreshTokenJwt.getSubject());
+            } else {
+                userDetails = jwtSocialUserDetailsService.loadUserByUsername(refreshTokenJwt.getSubject());
+            }
+        } catch (final UsernameNotFoundException userNotFoundEx) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        return buildAuthenticationResponse(userDetails, loginType, null, null);
+    }
+
+    private AuthenticationResponse buildAuthenticationResponse(final UserDetails userDetails,
+            final String loginType, final Duration accessTokenValidity,
+            final Duration refreshTokenValidity) {
         final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setAccessToken(jwtTokenService.generateToken(userDetails, loginType, validity));
+        authenticationResponse.setAccessToken(
+                jwtTokenService.generateAccessToken(userDetails, loginType, accessTokenValidity));
+        authenticationResponse.setRefreshToken(
+                jwtTokenService.generateRefreshToken(userDetails, loginType, refreshTokenValidity));
         return authenticationResponse;
     }
 

@@ -20,8 +20,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JwtTokenService {
 
-    private static final Duration JWT_TOKEN_VALIDITY = Duration.ofMinutes(60);
-    private static final Duration MAX_TOKEN_VALIDITY = Duration.ofMinutes(60);
+    private static final Duration ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(60);
+    private static final Duration MAX_ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(60);
+    private static final Duration REFRESH_TOKEN_VALIDITY = Duration.ofHours(30);
+    private static final Duration MAX_REFRESH_TOKEN_VALIDITY = Duration.ofHours(30);
 
     private final Algorithm rsa256;
     private final JWTVerifier verifier;
@@ -32,13 +34,28 @@ public class JwtTokenService {
         this.verifier = JWT.require(this.rsa256).build();
     }
 
-    public String generateToken(final UserDetails userDetails, final String loginType,
+    public String generateAccessToken(final UserDetails userDetails, final String loginType,
             final Duration validity) {
+        return generateToken(userDetails, loginType, TokenType.ACCESS, validity,
+                ACCESS_TOKEN_VALIDITY, MAX_ACCESS_TOKEN_VALIDITY);
+    }
+
+    public String generateRefreshToken(final UserDetails userDetails, final String loginType,
+            final Duration validity) {
+        return generateToken(userDetails, loginType, TokenType.REFRESH, validity,
+                REFRESH_TOKEN_VALIDITY, MAX_REFRESH_TOKEN_VALIDITY);
+    }
+
+    private String generateToken(final UserDetails userDetails, final String loginType,
+            final TokenType tokenType, final Duration validity, final Duration defaultValidity,
+            final Duration maxValidity) {
         final Instant now = Instant.now();
-        final Duration tokenValidity = validity == null ? JWT_TOKEN_VALIDITY : (validity.compareTo(MAX_TOKEN_VALIDITY) > 0 ? MAX_TOKEN_VALIDITY : validity);
+        final Duration tokenValidity = validity == null ? defaultValidity
+                : (validity.compareTo(maxValidity) > 0 ? maxValidity : validity);
         return JWT.create()
                 .withSubject(userDetails.getUsername())
                 .withClaim("login_type", loginType)
+                .withClaim("token_type", tokenType.getValue())
                 // only for client information
                 .withArrayClaim("roles", userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -49,12 +66,42 @@ public class JwtTokenService {
                 .sign(this.rsa256);
     }
 
-    public DecodedJWT validateToken(final String token) {
+    public DecodedJWT validateAccessToken(final String token) {
+        return validateToken(token, TokenType.ACCESS);
+    }
+
+    public DecodedJWT validateRefreshToken(final String token) {
+        return validateToken(token, TokenType.REFRESH);
+    }
+
+    private DecodedJWT validateToken(final String token, final TokenType expectedType) {
         try {
-            return verifier.verify(token);
+            final DecodedJWT jwt = verifier.verify(token);
+            final String tokenType = jwt.getClaim("token_type").asString();
+            if (!expectedType.getValue().equals(tokenType)) {
+                log.warn("Invalid token type: Expected {}, Found: {}", expectedType.getValue(),
+                        tokenType);
+                return null;
+            }
+            return jwt;
         } catch (final JWTVerificationException verificationEx) {
             log.warn("token invalid: {}", verificationEx.getMessage());
             return null;
+        }
+    }
+
+    private enum TokenType {
+        ACCESS("access"),
+        REFRESH("refresh");
+
+        private final String value;
+
+        TokenType(final String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
         }
     }
 
