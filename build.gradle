@@ -22,30 +22,20 @@ repositories {
     mavenCentral()
 }
 
-dependencyManagement {
-    imports {
-        mavenBom('org.springframework.modulith:spring-modulith-bom:2.0.0')
-    }
-}
-
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter-validation')
-    implementation('org.springframework.modulith:spring-modulith-starter-core')
     implementation('org.springframework.boot:spring-boot-starter-security')
     implementation('com.auth0:java-jwt:4.5.0')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     runtimeOnly('com.h2database:h2')
-    implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('io.github.wimdeblauwe:error-handling-spring-boot-starter:5.0.0')
     implementation('org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0')
     compileOnly('org.projectlombok:lombok')
     annotationProcessor('org.projectlombok:lombok')
     testCompileOnly('org.projectlombok:lombok')
     testAnnotationProcessor('org.projectlombok:lombok')
-    testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('io.rest-assured:rest-assured:6.0.0')
-    testImplementation('org.springframework.modulith:spring-modulith-starter-test')
 }
 
 node {

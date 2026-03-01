@@ -1,6 +1,5 @@
 package io.security.base.privilege;
 
-import io.security.base.PrivilegeService;
 import io.security.base.security.UserRoles;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;

@@ -1,7 +1,6 @@
 package io.security.base.urls;
 
-import io.security.base.PrivilegeService;
-import io.security.base.UrlsService;
+import io.security.base.privilege.PrivilegeService;
 import io.security.base.security.UserRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

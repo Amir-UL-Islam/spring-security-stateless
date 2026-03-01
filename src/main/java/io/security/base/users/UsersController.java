@@ -1,7 +1,6 @@
 package io.security.base.users;
 
-import io.security.base.RoleService;
-import io.security.base.UsersService;
+import io.security.base.role.RoleService;
 import io.security.base.security.UserRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,7 +1,6 @@
-
 spring:
   datasource:
-    url: jdbc:h2:mem:stateless-security
+    url: jdbc:h2:mem:stateless_security
     username: sa
     password:
     hikari:
@@ -37,14 +36,6 @@ error:
       RoleDescriptionUnique: ROLE_DESCRIPTION_UNIQUE
       PrivilegeNameUnique: PRIVILEGE_NAME_UNIQUE
       UrlsEndpointUnique: URLS_ENDPOINT_UNIQUE
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,caches,sessions
-  endpoint:
-    health:
-      show-details: always
 springdoc:
   pathsToMatch: /api/**, /authenticate, /register
 app:
