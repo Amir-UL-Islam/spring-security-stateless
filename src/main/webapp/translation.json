@@ -1,0 +1,292 @@
+{
+  "app": {
+    "title": "Stateless Security"
+  },
+  "navigation": {
+    "toggle": "Toggle navigation",
+    "home": "Home",
+    "entities": "Entities",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "home": {
+    "index": {
+      "headline": "Welcome to your new app!",
+      "text": "Hello!",
+      "swagger": {
+        "text": "Swagger is",
+        "link": "available here"
+      },
+      "exploreEntities": "Explore your entities"
+    }
+  },
+  "error": {
+    "page": {
+      "headline": "Error",
+      "message": "The page you are looking for is not available right now."
+    }
+  },
+  "users": {
+    "list": {
+      "headline": "Userses",
+      "createNew": "Create new Users",
+      "empty": "No Userses could be found.",
+      "sort": {
+        "id,ASC": "Sort by Id (Ascending)",
+        "name,ASC": "Sort by Name (Ascending)",
+        "email,ASC": "Sort by Email (Ascending)"
+      },
+      "filter": "Filter by Id",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "add": {
+      "headline": "Add Users",
+      "back": "Back to list"
+    },
+    "id": {
+      "label": "Id"
+    },
+    "name": {
+      "label": "Name"
+    },
+    "email": {
+      "label": "Email"
+    },
+    "username": {
+      "label": "Username"
+    },
+    "password": {
+      "label": "Password"
+    },
+    "role": {
+      "label": "Role"
+    },
+    "edit": {
+      "headline": "Edit Users",
+      "back": "Back to list"
+    },
+    "create": {
+      "success": "Users was created successfully."
+    },
+    "update": {
+      "success": "Users was updated successfully."
+    },
+    "delete": {
+      "success": "Users was removed successfully."
+    }
+  },
+  "role": {
+    "list": {
+      "headline": "Roles",
+      "createNew": "Create new Role",
+      "empty": "No Roles could be found.",
+      "sort": {
+        "id,ASC": "Sort by Id (Ascending)",
+        "name,ASC": "Sort by Name (Ascending)",
+        "description,ASC": "Sort by Description (Ascending)"
+      },
+      "filter": "Filter by Id",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "add": {
+      "headline": "Add Role",
+      "back": "Back to list"
+    },
+    "id": {
+      "label": "Id"
+    },
+    "name": {
+      "label": "Name"
+    },
+    "description": {
+      "label": "Description"
+    },
+    "privilege": {
+      "label": "Privilege"
+    },
+    "edit": {
+      "headline": "Edit Role",
+      "back": "Back to list"
+    },
+    "users": {
+      "role": {
+        "referenced": "This entity is still referenced by Users {{id}} via field Role."
+      }
+    },
+    "create": {
+      "success": "Role was created successfully."
+    },
+    "update": {
+      "success": "Role was updated successfully."
+    },
+    "delete": {
+      "success": "Role was removed successfully."
+    }
+  },
+  "privilege": {
+    "list": {
+      "headline": "Privileges",
+      "createNew": "Create new Privilege",
+      "empty": "No Privileges could be found.",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "add": {
+      "headline": "Add Privilege",
+      "back": "Back to list"
+    },
+    "id": {
+      "label": "Id"
+    },
+    "name": {
+      "label": "Name"
+    },
+    "edit": {
+      "headline": "Edit Privilege",
+      "back": "Back to list"
+    },
+    "role": {
+      "privilege": {
+        "referenced": "This entity is still referenced by Role {{id}} via field Privilege."
+      }
+    },
+    "urls": {
+      "privilege": {
+        "referenced": "This entity is still referenced by Urls {{id}} via field Privilege."
+      }
+    },
+    "create": {
+      "success": "Privilege was created successfully."
+    },
+    "update": {
+      "success": "Privilege was updated successfully."
+    },
+    "delete": {
+      "success": "Privilege was removed successfully."
+    }
+  },
+  "urls": {
+    "list": {
+      "headline": "Urlses",
+      "createNew": "Create new Urls",
+      "empty": "No Urlses could be found.",
+      "sort": {
+        "id,ASC": "Sort by Id (Ascending)",
+        "endpoint,ASC": "Sort by Endpoint (Ascending)",
+        "method,ASC": "Sort by Method (Ascending)"
+      },
+      "filter": "Filter by Id",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "add": {
+      "headline": "Add Urls",
+      "back": "Back to list"
+    },
+    "id": {
+      "label": "Id"
+    },
+    "endpoint": {
+      "label": "Endpoint"
+    },
+    "method": {
+      "label": "Method"
+    },
+    "privilege": {
+      "label": "Privilege"
+    },
+    "edit": {
+      "headline": "Edit Urls",
+      "back": "Back to list"
+    },
+    "create": {
+      "success": "Urls was created successfully."
+    },
+    "update": {
+      "success": "Urls was updated successfully."
+    },
+    "delete": {
+      "success": "Urls was removed successfully."
+    }
+  },
+  "authentication": {
+    "login": {
+      "headline": "Login",
+      "required": "Please login to access this area.",
+      "error": "Your login was not successful - please try again."
+    },
+    "username": {
+      "label": "Username"
+    },
+    "password": {
+      "label": "Password"
+    },
+    "registerNow": {
+      "text": "You don't have an account yet?",
+      "link": "Register now"
+    },
+    "social": {
+      "headline": "Or continue with",
+      "google": "Google"
+    },
+    "logout": {
+      "success": "Your logout was successful."
+    }
+  },
+  "registrationRequest": {
+    "name": {
+      "label": "Name"
+    },
+    "username": {
+      "label": "Username"
+    },
+    "password": {
+      "label": "Password"
+    }
+  },
+  "registration": {
+    "register": {
+      "headline": "Registration",
+      "taken": "This account is already taken. Please login.",
+      "success": "Your registration is complete. You may now login."
+    }
+  },
+  "exists": {
+    "users": {
+      "username": "This Username is already taken."
+    },
+    "role": {
+      "name": "This Name is already taken.",
+      "description": "This Description is already taken."
+    },
+    "privilege": {
+      "name": "This Name is already taken."
+    },
+    "urls": {
+      "endpoint": "This Endpoint is already taken."
+    }
+  },
+  "select": {
+    "empty": {
+      "label": "Please select"
+    }
+  },
+  "delete": {
+    "confirm": "Do you really want to delete this element? This cannot be undone."
+  },
+  "operation": {
+    "success": "Your operation was successful."
+  },
+  "required": "Please provide a value.",
+  "maxlength": "Your value must have a length of less then ${max} characters.",
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "elements": "Item {{range}} of {{total}}"
+  },
+  "searchFilter": {
+    "apply": "Apply"
+  }
+}
