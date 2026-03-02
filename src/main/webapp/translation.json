@@ -11,13 +11,13 @@
   },
   "home": {
     "index": {
-      "headline": "Welcome to your new app!",
+      "headline": "Welcome to new security application!",
       "text": "Hello!",
       "swagger": {
         "text": "Swagger is",
         "link": "available here"
       },
-      "exploreEntities": "Explore your entities"
+      "exploreEntities": "Explore your entities CURD operations."
     }
   },
   "error": {
