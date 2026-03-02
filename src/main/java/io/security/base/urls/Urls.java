@@ -1,5 +1,6 @@
 package io.security.base.urls;
 
+import io.security.base.core.BaseEntity;
 import io.security.base.privilege.Privilege;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,21 +24,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class Urls {
-
-    @Id
-    @Column(nullable = false, updatable = false)
-    @SequenceGenerator(
-            name = "primary_sequence",
-            sequenceName = "primary_sequence",
-            allocationSize = 1,
-            initialValue = 10000
-    )
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "primary_sequence"
-    )
-    private Long id;
+public class Urls extends BaseEntity {
 
     @Column(nullable = false)
     private String endpoint;
@@ -48,13 +35,5 @@ public class Urls {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "privilege_id", nullable = false)
     private Privilege privilege;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private OffsetDateTime dateCreated;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private OffsetDateTime lastUpdated;
 
 }

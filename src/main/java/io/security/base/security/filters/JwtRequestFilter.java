@@ -50,7 +50,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         }
 
         final String token = header.substring(7);
-        final DecodedJWT jwt = jwtTokenService.validateToken(token);
+        final DecodedJWT jwt = jwtTokenService.validateAccessToken(token);
         if (jwt == null || jwt.getSubject() == null) {
             // validation failed or token expired
             chain.doFilter(request, response);
