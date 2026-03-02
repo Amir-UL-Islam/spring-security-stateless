@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/roles", produces = MediaType.APPLICATION_JSON_VALUE)
-@PreAuthorize("hasAuthority('" + UserRoles.ADMIN + "')")
-@SecurityRequirement(name = "bearer-jwt")
+//@PreAuthorize("hasAuthority('" + UserRoles.ADMIN + "')")
+//@SecurityRequirement(name = "bearer-jwt")
 public class RoleController {
 
     private final RoleService roleService;

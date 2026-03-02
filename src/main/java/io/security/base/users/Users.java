@@ -47,4 +47,10 @@ public class Users extends BaseEntity {
     )
     private Set<Role> role = new HashSet<>();
 
+    @Column
+    private Boolean twoFactorEnabled = false;
+
+    @Column
+    private String totpSecret;
+
 }

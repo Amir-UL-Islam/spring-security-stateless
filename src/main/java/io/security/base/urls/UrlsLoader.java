@@ -3,8 +3,10 @@ package io.security.base.urls;
 import io.security.base.privilege.Privilege;
 import io.security.base.privilege.PrivilegeRepository;
 import jakarta.transaction.Transactional;
+
 import java.util.Map;
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -64,7 +66,10 @@ public class UrlsLoader implements ApplicationRunner {
 
                 entry("/api/userss", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
                 entry("/api/userss/roleValues", methods("GET")),
-                entry("/api/userss/{id}", methods("GET", "PUT", "DELETE"))
+                entry("/api/userss/{id}", methods("GET", "PUT", "DELETE")),
+                entry("/api/2fa/setup", methods("POST")),
+                entry("/api/2fa/activate", methods("POST")),
+                entry("/api/2fa/disable", methods("POST"))
         );
 
         adminEndpoints.forEach((endpoint, methods) -> addUrls(endpoint, methods, privilege));
@@ -73,7 +78,10 @@ public class UrlsLoader implements ApplicationRunner {
     private void seedUserUrls(final Privilege privilege) {
         Map<String, String[]> userEndpoints = Map.of(
                 "/api/userss", methods("GET"),
-                "/api/userss/{id}", methods("GET")
+                "/api/userss/{id}", methods("GET"),
+                "/api/2fa/setup", methods("POST"),
+                "/api/2fa/activate", methods("POST"),
+                "/api/2fa/disable", methods("POST")
         );
         userEndpoints.forEach((endpoint, methods) -> addUrls(endpoint, methods, privilege));
     }

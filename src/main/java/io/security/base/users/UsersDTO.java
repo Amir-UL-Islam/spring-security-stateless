@@ -2,7 +2,9 @@ package io.security.base.users;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,5 +31,9 @@ public class UsersDTO {
     private String password;
 
     private List<Long> role;
+
+    private Boolean twoFactorEnabled;
+
+    private String totpSecret;
 
 }

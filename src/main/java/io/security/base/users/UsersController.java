@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/userss", produces = MediaType.APPLICATION_JSON_VALUE)
-@PreAuthorize("hasAnyAuthority('" + UserRoles.ADMIN + "', '" + UserRoles.USER + "')")
-@SecurityRequirement(name = "bearer-jwt")
+//@PreAuthorize("hasAnyAuthority('" + UserRoles.ADMIN + "', '" + UserRoles.USER + "')")
+//@SecurityRequirement(name = "bearer-jwt")
 public class UsersController {
 
     private final UsersService usersService;

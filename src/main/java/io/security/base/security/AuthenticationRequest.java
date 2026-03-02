@@ -18,4 +18,7 @@ public class AuthenticationRequest {
     @Size(max = 72)
     private String password;
 
+    // Optional TOTP code when two-factor is enabled
+    private String otp;
+
 }

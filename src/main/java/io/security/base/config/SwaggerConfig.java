@@ -16,6 +16,7 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.security.Scopes;
 import org.springdoc.core.customizers.OperationCustomizer;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -57,7 +58,7 @@ public class SwaggerConfig {
 
     @Bean
     public OperationCustomizer operationCustomizer() {
-        // add error type to each operation
+        // add an error type to each operation
         return (operation, handlerMethod) -> {
             operation.getResponses().addApiResponse("4xx/5xx", new ApiResponse()
                     .description("Error")
@@ -65,6 +66,14 @@ public class SwaggerConfig {
                             new Schema<MediaType>().$ref("ApiErrorResponse")))));
             return operation;
         };
+    }
+
+    @Bean
+    public OpenApiCustomizer addSecurityRequirement() {
+        return openApi -> openApi.getPaths().values().forEach(pathItem ->
+                pathItem.readOperations().forEach(operation ->
+                        operation.addSecurityItem(new SecurityRequirement().addList("oauth2-password")
+                                .addList("bearer-jwt"))));
     }
 
 }

@@ -36,7 +36,7 @@ public class PrivilegeLoader implements ApplicationRunner {
         }
         final Privilege privilege = new Privilege();
         privilege.setName(name);
-        privilegeRepository.save(privilege);
+        privilegeRepository.saveAndFlush(privilege);
     }
 }
 

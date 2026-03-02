@@ -44,6 +44,7 @@ public class AuthenticationController {
     private final UsersRepository usersRepository;
     private final String baseHost;
     private final RoleRepository roleRepository;
+    private final TwoFactorService twoFactorService;
     private final RestClient googleClient = RestClient.builder()
             .baseUrl("https://oauth2.googleapis.com/")
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +56,8 @@ public class AuthenticationController {
                                     final JwtTokenService jwtTokenService, final Environment environment,
                                     final UsersRepository usersRepository,
                                     @Value("${app.baseHost}") final String baseHost,
-                                    final RoleRepository roleRepository) {
+                                    final RoleRepository roleRepository,
+                                    final TwoFactorService twoFactorService) {
         this.authenticationProvider = authenticationProvider;
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtSocialUserDetailsService = jwtSocialUserDetailsService;
@@ -64,6 +66,7 @@ public class AuthenticationController {
         this.usersRepository = usersRepository;
         this.baseHost = baseHost;
         this.roleRepository = roleRepository;
+        this.twoFactorService = twoFactorService;
     }
 
     @PostMapping("/authenticate")
@@ -77,6 +80,7 @@ public class AuthenticationController {
         }
 
         final JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        enforceTwoFactor(authenticationRequest.getOtp(), userDetails.getUsername());
         return buildAuthenticationResponse(userDetails, "direct", null, null);
     }
 
@@ -84,7 +88,8 @@ public class AuthenticationController {
     public Map<String, Object> passwordGrant(
             @RequestParam("username") final String username,
             @RequestParam("password") final String password,
-            @RequestParam(value = "scope", required = false) final String scope) {
+            @RequestParam(value = "scope", required = false) final String scope,
+            @RequestParam(value = "otp", required = false) final String otp) {
         try {
             authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (final BadCredentialsException ex) {
@@ -92,6 +97,7 @@ public class AuthenticationController {
         }
 
         final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+        enforceTwoFactor(otp, userDetails.getUsername());
         final String accessToken = jwtTokenService.generateAccessToken(userDetails, "direct", null);
         final String refreshToken = jwtTokenService.generateRefreshToken(userDetails, "direct", null);
 
@@ -202,6 +208,15 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
         return synchronizeUserAndGetToken(providerId, subject, tokenInfoResponse, expiresAt);
+    }
+
+    private void enforceTwoFactor(final String otp, final String username) {
+        final Users users = usersRepository.findByUsernameIgnoreCase(username);
+        if (Boolean.TRUE.equals(users.getTwoFactorEnabled())) {
+            if (!twoFactorService.isCodeValid(users.getTotpSecret(), otp)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or missing 2FA code");
+            }
+        }
     }
 
 }

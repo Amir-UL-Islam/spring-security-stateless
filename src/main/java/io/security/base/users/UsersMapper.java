@@ -25,6 +25,8 @@ public class UsersMapper {
         usersDTO.setRole(users.getRole().stream()
                 .map(role -> role.getId())
                 .toList());
+        usersDTO.setTwoFactorEnabled(users.getTwoFactorEnabled());
+        usersDTO.setTotpSecret(users.getTotpSecret());
         return usersDTO;
     }
 
@@ -39,6 +41,8 @@ public class UsersMapper {
             throw new NotFoundException("one of role not found");
         }
         users.setRole(new HashSet<>(role));
+        users.setTwoFactorEnabled(usersDTO.getTwoFactorEnabled());
+        users.setTotpSecret(usersDTO.getTotpSecret());
         return users;
     }
 }

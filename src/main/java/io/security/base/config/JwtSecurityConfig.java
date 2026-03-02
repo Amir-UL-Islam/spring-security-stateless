@@ -76,6 +76,14 @@ public class JwtSecurityConfig {
                                 "/authenticateGoogle",
                                 "/oauth/token",
                                 "/register",
+                                "/",
+                                "/index.html",
+                                "/static/**",
+                                "/assets/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/favicon.ico",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html")
@@ -90,4 +98,3 @@ public class JwtSecurityConfig {
                 .build();
     }
 }
-
