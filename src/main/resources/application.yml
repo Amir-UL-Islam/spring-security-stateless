@@ -37,7 +37,7 @@ error:
       PrivilegeNameUnique: PRIVILEGE_NAME_UNIQUE
       UrlsEndpointUnique: URLS_ENDPOINT_UNIQUE
 springdoc:
-  pathsToMatch: /api/**, /authenticate, /register
+  pathsToMatch: /api/**, /authenticate, /authenticateGoogle, /refresh-token, /register
 app:
   baseHost: http://localhost:8800
   google:
