@@ -13,4 +13,6 @@ public interface UrlsRepository extends JpaRepository<Urls, Long> {
 
     boolean existsByEndpointIgnoreCase(String endpoint);
 
+    boolean existsByEndpointIgnoreCaseAndMethodIgnoreCase(String endpoint, String method);
+
 }

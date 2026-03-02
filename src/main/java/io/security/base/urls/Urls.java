@@ -39,7 +39,7 @@ public class Urls {
     )
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String endpoint;
 
     @Column(nullable = false)

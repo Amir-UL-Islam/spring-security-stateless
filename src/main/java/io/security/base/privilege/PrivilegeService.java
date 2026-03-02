@@ -4,12 +4,17 @@ import io.security.base.events.BeforeDeletePrivilege;
 import io.security.base.util.CustomCollectors;
 import io.security.base.util.NotFoundException;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,4 +73,30 @@ public class PrivilegeService {
                 .collect(CustomCollectors.toSortedMap(Privilege::getId, Privilege::getName));
     }
 
+    public boolean hasPermission(Authentication authentication, HttpServletRequest request) {
+        // Extract the current URL pattern and HTTP method
+        String urlPattern = request.getRequestURI();
+
+        String httpMethod = request.getMethod();
+
+        // Find permissions for this URL and method
+        List<Privilege> permissions = privilegeRepository.findByUrlPatternAndHttpMethod(urlPattern, httpMethod);
+
+        // If no specific permissions, deny access
+        if (permissions.isEmpty()) {
+            return false;
+        }
+
+        // Get user authorities
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+        // Check if a user has a required role
+        return permissions.stream()
+                .anyMatch(permission ->
+                        authorities.stream()
+                                .anyMatch(authority ->
+                                        Objects.equals(authority.getAuthority(), permission.getName())
+                                )
+                );
+    }
 }

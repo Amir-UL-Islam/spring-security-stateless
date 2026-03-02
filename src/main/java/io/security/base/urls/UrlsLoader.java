@@ -1,0 +1,99 @@
+package io.security.base.urls;
+
+import io.security.base.privilege.Privilege;
+import io.security.base.privilege.PrivilegeRepository;
+import jakarta.transaction.Transactional;
+import java.util.Map;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+
+@Component
+@Order(2)
+@Slf4j
+public class UrlsLoader implements ApplicationRunner {
+
+    private final UrlsRepository urlsRepository;
+    private final PrivilegeRepository privilegeRepository;
+
+    public UrlsLoader(final UrlsRepository urlsRepository,
+                      final PrivilegeRepository privilegeRepository) {
+        this.urlsRepository = urlsRepository;
+        this.privilegeRepository = privilegeRepository;
+    }
+
+    @Override
+    @Transactional
+    public void run(final ApplicationArguments args) {
+        if (urlsRepository.count() != 0) {
+            return;
+        }
+        log.info("initializing urls");
+
+        final Optional<Privilege> adminPrivilege = privilegeRepository.findByNameIgnoreCase("ADMIN");
+        final Optional<Privilege> userPrivilege = privilegeRepository.findByNameIgnoreCase("USER");
+        if (adminPrivilege.isEmpty() || userPrivilege.isEmpty()) {
+            log.warn("privileges missing, skipping url seeding");
+            return;
+        }
+
+        seedAdminUrls(adminPrivilege.get());
+        seedUserUrls(userPrivilege.get());
+    }
+
+    private void seedAdminUrls(final Privilege privilege) {
+        Map<String, String[]> adminEndpoints = Map.ofEntries(
+                entry("/authenticate", methods("POST")),
+                entry("/authenticateGoogle", methods("POST")),
+                entry("/register", methods("POST")),
+
+                entry("/api/roles", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/roles/privilegeValues", methods("GET")),
+                entry("/api/roles/{id}", methods("GET", "PUT", "DELETE")),
+
+                entry("/api/privileges", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/privileges/{id}", methods("GET", "PUT", "DELETE")),
+
+                entry("/api/urls", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/urls/privilegeValues", methods("GET")),
+                entry("/api/urls/{id}", methods("GET", "PUT", "DELETE")),
+
+                entry("/api/userss", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/userss/roleValues", methods("GET")),
+                entry("/api/userss/{id}", methods("GET", "PUT", "DELETE"))
+        );
+
+        adminEndpoints.forEach((endpoint, methods) -> addUrls(endpoint, methods, privilege));
+    }
+
+    private void seedUserUrls(final Privilege privilege) {
+        Map<String, String[]> userEndpoints = Map.of(
+                "/api/userss", methods("GET"),
+                "/api/userss/{id}", methods("GET")
+        );
+        userEndpoints.forEach((endpoint, methods) -> addUrls(endpoint, methods, privilege));
+    }
+
+    private void addUrls(final String endpoint, final String[] methods, final Privilege privilege) {
+        for (final String method : methods) {
+            final Urls urls = new Urls();
+            urls.setEndpoint(endpoint);
+            urls.setMethod(method);
+            urls.setPrivilege(privilege);
+            urlsRepository.save(urls);
+        }
+    }
+
+    private static String[] methods(final String... methods) {
+        return methods;
+    }
+
+    private static Map.Entry<String, String[]> entry(final String key, final String[] value) {
+        return Map.entry(key, value);
+    }
+}
+

@@ -4,10 +4,12 @@ import io.security.base.role.RoleRepository;
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
 import jakarta.validation.Valid;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -27,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Slf4j
-public class AuthenticationResource {
+public class AuthenticationController {
 
     private final AuthenticationProvider authenticationProvider;
     private final JwtUserDetailsService jwtUserDetailsService;
@@ -42,12 +44,13 @@ public class AuthenticationResource {
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .build();
 
-    public AuthenticationResource(final AuthenticationProvider authenticationProvider,
-            final JwtUserDetailsService jwtUserDetailsService,
-            final JwtSocialUserDetailsService jwtSocialUserDetailsService,
-            final JwtTokenService jwtTokenService, final Environment environment,
-            final UsersRepository usersRepository, @Value("${app.baseHost}") final String baseHost,
-            final RoleRepository roleRepository) {
+    public AuthenticationController(final AuthenticationProvider authenticationProvider,
+                                    final JwtUserDetailsService jwtUserDetailsService,
+                                    final JwtSocialUserDetailsService jwtSocialUserDetailsService,
+                                    final JwtTokenService jwtTokenService, final Environment environment,
+                                    final UsersRepository usersRepository,
+                                    @Value("${app.baseHost}") final String baseHost,
+                                    final RoleRepository roleRepository) {
         this.authenticationProvider = authenticationProvider;
         this.jwtUserDetailsService = jwtUserDetailsService;
         this.jwtSocialUserDetailsService = jwtSocialUserDetailsService;
@@ -75,7 +78,7 @@ public class AuthenticationResource {
     }
 
     private AuthenticationResponse synchronizeUserAndGetToken(final String loginType,
-            final String subject, final  Map<String, Object> tokeninfoResponse, final Instant expiresAt) {
+                                                              final String subject, final Map<String, Object> tokeninfoResponse, final Instant expiresAt) {
         Users users = usersRepository.findByEmail(subject);
         if (users == null) {
             log.info("adding new user after successful authentication: {}", subject);
@@ -107,8 +110,8 @@ public class AuthenticationResource {
         final RestClient.ResponseSpec accessTokenSpec = googleClient.post()
                 .uri("token")
                 .body(Map.of("client_id", clientId, "client_secret", clientSecret,
-                "redirect_uri", baseHost + "/completeLogin?provider=google", "grant_type", "authorization_code",
-                "code", authenticationSocialRequest.getCode()))
+                        "redirect_uri", baseHost + "/completeLogin?provider=google", "grant_type", "authorization_code",
+                        "code", authenticationSocialRequest.getCode()))
                 .retrieve();
         final Map<String, Object> accessTokenResponse = accessTokenSpec.body(new ParameterizedTypeReference<>() {
         });
@@ -116,9 +119,9 @@ public class AuthenticationResource {
         log.info("validating google access token");
         final RestClient.ResponseSpec tokeninfoSpec = googleClient.get()
                 .uri(uriBuilder -> uriBuilder
-                    .path("tokeninfo")
-                    .queryParam("id_token", accessTokenResponse.get("id_token"))
-                    .build())
+                        .path("tokeninfo")
+                        .queryParam("id_token", accessTokenResponse.get("id_token"))
+                        .build())
                 .retrieve();
         final Map<String, Object> tokeninfoResponse = tokeninfoSpec.body(new ParameterizedTypeReference<>() {
         });
