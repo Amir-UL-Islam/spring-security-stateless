@@ -21,10 +21,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.server.ResponseStatusException;
@@ -76,6 +78,34 @@ public class AuthenticationController {
 
         final JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         return buildAuthenticationResponse(userDetails, "direct", null, null);
+    }
+
+    @PostMapping(value = "/oauth/token", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> passwordGrant(
+            @RequestParam("username") final String username,
+            @RequestParam("password") final String password,
+            @RequestParam(value = "scope", required = false) final String scope) {
+        try {
+            authenticationProvider.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (final BadCredentialsException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+        final String accessToken = jwtTokenService.generateAccessToken(userDetails, "direct", null);
+        final String refreshToken = jwtTokenService.generateRefreshToken(userDetails, "direct", null);
+
+        final String resolvedScope = scope != null ? scope
+                : String.join(" ", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).toList());
+
+        return Map.of(
+                "access_token", accessToken,
+                "refresh_token", refreshToken,
+                "token_type", "bearer",
+                "expires_in", jwtTokenService.accessTokenValiditySeconds(),
+                "scope", resolvedScope
+        );
     }
 
     private AuthenticationResponse synchronizeUserAndGetToken(final String loginType,
@@ -153,25 +183,25 @@ public class AuthenticationController {
         });
 
         log.info("validating google access token");
-        final RestClient.ResponseSpec tokeninfoSpec = googleClient.get()
+        final RestClient.ResponseSpec tokenInfoSpec = googleClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("tokeninfo")
                         .queryParam("id_token", accessTokenResponse.get("id_token"))
                         .build())
                 .retrieve();
-        final Map<String, Object> tokeninfoResponse = tokeninfoSpec.body(new ParameterizedTypeReference<>() {
+        final Map<String, Object> tokenInfoResponse = tokenInfoSpec.body(new ParameterizedTypeReference<>() {
         });
-        if (!clientId.equals(tokeninfoResponse.get("aud"))) {
+        if (!clientId.equals(tokenInfoResponse.get("aud"))) {
             log.warn("google app id not matching");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        final String subject = tokeninfoResponse.get("sub").toString();
-        final Instant expiresAt = Instant.ofEpochSecond(Long.parseLong(tokeninfoResponse.get("exp").toString()));
+        final String subject = tokenInfoResponse.get("sub").toString();
+        final Instant expiresAt = Instant.ofEpochSecond(Long.parseLong(tokenInfoResponse.get("exp").toString()));
         if (expiresAt.isBefore(Instant.now())) {
             log.warn("google token has expired");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        return synchronizeUserAndGetToken(providerId, subject, tokeninfoResponse, expiresAt);
+        return synchronizeUserAndGetToken(providerId, subject, tokenInfoResponse, expiresAt);
     }
 
 }

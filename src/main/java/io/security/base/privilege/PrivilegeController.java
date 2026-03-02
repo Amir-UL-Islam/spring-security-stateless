@@ -21,8 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "/api/privileges", produces = MediaType.APPLICATION_JSON_VALUE)
-@PreAuthorize("hasAuthority('" + UserRoles.ADMIN + "')")
-@SecurityRequirement(name = "bearer-jwt")
+@SecurityRequirement(name = "oauth2-password")
 public class PrivilegeController {
 
     private final PrivilegeService privilegeService;

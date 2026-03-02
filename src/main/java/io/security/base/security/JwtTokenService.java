@@ -74,6 +74,10 @@ public class JwtTokenService {
         return validateToken(token, TokenType.REFRESH);
     }
 
+    public long accessTokenValiditySeconds() {
+        return ACCESS_TOKEN_VALIDITY.getSeconds();
+    }
+
     private DecodedJWT validateToken(final String token, final TokenType expectedType) {
         try {
             final DecodedJWT jwt = verifier.verify(token);
