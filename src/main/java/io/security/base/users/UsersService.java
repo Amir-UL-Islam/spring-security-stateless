@@ -7,6 +7,7 @@ import io.security.base.util.NotFoundException;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
@@ -72,7 +73,6 @@ public class UsersService {
         usersRepository.delete(users);
     }
 
-
     public boolean usernameExists(final String username) {
         return usersRepository.existsByUsernameIgnoreCase(username);
     }
@@ -87,4 +87,15 @@ public class UsersService {
     public Users findByUsername(String name) {
         return usersRepository.findByUsernameIgnoreCase(name);
     }
+
+    public void logoutAllDevices(String username) {
+        Users user = usersRepository.findByUsernameIgnoreCase(username);
+        if (user == null) {
+            return;
+        }
+        user.setTokenVersion(user.getTokenVersion() + new Random().nextInt());
+        usersRepository.save(user);
+    }
+
+
 }

@@ -29,6 +29,8 @@ public class PrivilegeService {
     private final ApplicationEventPublisher publisher;
 
 
+
+
     public List<PrivilegeDTO> findAll() {
         final List<Privilege> privileges = privilegeRepository.findAll(Sort.by("id"));
         return privileges.stream()
@@ -76,6 +78,7 @@ public class PrivilegeService {
     public boolean hasPermission(Authentication authentication, HttpServletRequest request) {
         // Extract the current URL pattern and HTTP method
         String urlPattern = request.getRequestURI();
+
 
         String httpMethod = request.getMethod();
 

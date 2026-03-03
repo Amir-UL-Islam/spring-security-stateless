@@ -24,7 +24,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,8 +38,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthenticationController {
 
     private final AuthenticationProvider authenticationProvider;
-    private final JwtUserDetailsService jwtUserDetailsService;
-    private final JwtSocialUserDetailsService jwtSocialUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
     private final JwtTokenService jwtTokenService;
     private final Environment environment;
     private final UsersRepository usersRepository;
@@ -52,17 +50,17 @@ public class AuthenticationController {
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
             .build();
 
-    public AuthenticationController(final AuthenticationProvider authenticationProvider,
-                                    final JwtUserDetailsService jwtUserDetailsService,
-                                    final JwtSocialUserDetailsService jwtSocialUserDetailsService,
-                                    final JwtTokenService jwtTokenService, final Environment environment,
-                                    final UsersRepository usersRepository,
-                                    @Value("${app.baseHost}") final String baseHost,
-                                    final RoleRepository roleRepository,
-                                    final TwoFactorService twoFactorService) {
+    public AuthenticationController(
+            final AuthenticationProvider authenticationProvider,
+            final CustomUserDetailsService customUserDetailsService,
+            final JwtTokenService jwtTokenService, final Environment environment,
+            final UsersRepository usersRepository,
+            @Value("${app.baseHost}") final String baseHost,
+            final RoleRepository roleRepository,
+            final TwoFactorService twoFactorService
+    ) {
         this.authenticationProvider = authenticationProvider;
-        this.jwtUserDetailsService = jwtUserDetailsService;
-        this.jwtSocialUserDetailsService = jwtSocialUserDetailsService;
+        this.customUserDetailsService = customUserDetailsService;
         this.jwtTokenService = jwtTokenService;
         this.environment = environment;
         this.usersRepository = usersRepository;
@@ -81,7 +79,7 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        final JwtUserDetails userDetails = jwtUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final Users userDetails = customUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         enforceTwoFactor(authenticationRequest.getOtp(), userDetails.getUsername());
         return buildAuthenticationResponse(userDetails, "direct", null, null);
     }
@@ -98,7 +96,7 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        final UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+        final Users userDetails = customUserDetailsService.loadUserByUsername(username);
         enforceTwoFactor(otp, userDetails.getUsername());
         final String accessToken = jwtTokenService.generateAccessToken(userDetails, "direct", null);
         final String refreshToken = jwtTokenService.generateRefreshToken(userDetails, "direct", null);
@@ -132,7 +130,7 @@ public class AuthenticationController {
         }
         usersRepository.save(users);
 
-        final JwtUserDetails userDetails = jwtSocialUserDetailsService.loadUserByUsername(subject);
+        final Users userDetails = customUserDetailsService.loadUserByUsername(subject);
         final Duration validity = Duration.between(Instant.now(), expiresAt);
         return buildAuthenticationResponse(userDetails, loginType, validity, null);
     }
@@ -149,13 +147,10 @@ public class AuthenticationController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
 
-        final UserDetails userDetails;
+        final Users userDetails;
+
         try {
-            if ("direct".equals(loginType)) {
-                userDetails = jwtUserDetailsService.loadUserByUsername(refreshTokenJwt.getSubject());
-            } else {
-                userDetails = jwtSocialUserDetailsService.loadUserByUsername(refreshTokenJwt.getSubject());
-            }
+            userDetails = customUserDetailsService.loadUserByUsername(refreshTokenJwt.getSubject());
         } catch (final UsernameNotFoundException userNotFoundEx) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
@@ -163,9 +158,12 @@ public class AuthenticationController {
         return buildAuthenticationResponse(userDetails, loginType, null, null);
     }
 
-    private AuthenticationResponse buildAuthenticationResponse(final UserDetails userDetails,
-            final String loginType, final Duration accessTokenValidity,
-            final Duration refreshTokenValidity) {
+    private AuthenticationResponse buildAuthenticationResponse(
+            final Users userDetails,
+            final String loginType,
+            final Duration accessTokenValidity,
+            final Duration refreshTokenValidity
+    ) {
         final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(
                 jwtTokenService.generateAccessToken(userDetails, loginType, accessTokenValidity));

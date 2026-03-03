@@ -15,6 +15,8 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -97,4 +99,15 @@ public class UsersController {
         return ResponseEntity.ok(roleService.getRoleValues());
     }
 
+
+    @PostMapping("/logout-all-devices")
+    public ResponseEntity<Void> logout(
+    ) {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.ok().build();
+        }
+        usersService.logoutAllDevices(authentication.getName());
+        return ResponseEntity.ok().build();
+    }
 }

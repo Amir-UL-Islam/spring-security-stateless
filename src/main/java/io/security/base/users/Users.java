@@ -60,6 +60,9 @@ public class Users extends BaseEntity implements UserDetails {
     @Column
     private String totpSecret;
 
+    @Column(nullable = false)
+    private int tokenVersion = 0;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.stream()

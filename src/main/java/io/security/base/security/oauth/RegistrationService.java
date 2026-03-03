@@ -4,6 +4,7 @@ import io.security.base.role.RoleRepository;
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
 
+import java.util.Random;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class RegistrationService {
         users.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
         // assign default role
         users.setRole(Set.of(roleRepository.findByName(UserRoles.ADMIN)));
+        users.setTokenVersion(new Random().nextInt());
         usersRepository.save(users);
     }
 

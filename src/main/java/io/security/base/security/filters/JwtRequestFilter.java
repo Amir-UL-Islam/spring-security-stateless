@@ -1,7 +1,9 @@
 package io.security.base.security.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import io.security.base.security.jwt.CustomUserDetailsService;
 import io.security.base.security.jwt.JwtTokenService;
+import io.security.base.users.Users;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 
@@ -24,19 +28,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * a valid JWT has been found, load the user details from the database and set the
  * authenticated principal for the duration of this request.
  */
+@Component
+@RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
 
-    private final UserDetailsService userDetailsService;
-    private final UserDetailsService socialUserDetailsService;
+    private final CustomUserDetailsService userDetailsService;
     private final JwtTokenService jwtTokenService;
-
-    public JwtRequestFilter(final UserDetailsService userDetailsService,
-                            final UserDetailsService socialUserDetailsService,
-                            final JwtTokenService jwtTokenService) {
-        this.userDetailsService = userDetailsService;
-        this.socialUserDetailsService = socialUserDetailsService;
-        this.jwtTokenService = jwtTokenService;
-    }
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request,
@@ -57,16 +54,16 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        final UserDetails userDetails;
+        final Users userDetails;
         try {
-            if ("direct".equals(jwt.getClaim("login_type").asString())) {
-                userDetails = userDetailsService.loadUserByUsername(jwt.getSubject());
-            } else {
-                userDetails = socialUserDetailsService.loadUserByUsername(jwt.getSubject());
-            }
+            userDetails = userDetailsService.loadUserByUsername(jwt.getSubject());
         } catch (final UsernameNotFoundException userNotFoundEx) {
             // user not found
             chain.doFilter(request, response);
+            return;
+        }
+        if (userDetails.getTokenVersion() != jwt.getClaim("token_version").asInt()) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token invalidated");
             return;
         }
 

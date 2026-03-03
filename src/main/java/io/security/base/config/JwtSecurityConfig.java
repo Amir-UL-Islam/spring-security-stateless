@@ -2,10 +2,13 @@ package io.security.base.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import io.security.base.security.jwt.JwtUserDetailsService;
+import io.security.base.security.jwt.CustomUserDetailsService;
 import io.security.base.security.filters.ACLFilter;
 import io.security.base.security.interceptor.CustomAccessDeniedHandler;
+
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +26,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 @Configuration
@@ -42,7 +48,7 @@ public class JwtSecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(final PasswordEncoder passwordEncoder,
-                                                         final JwtUserDetailsService jwtUserDetailsService) {
+                                                         final CustomUserDetailsService jwtUserDetailsService) {
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(jwtUserDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
@@ -96,5 +102,23 @@ public class JwtSecurityConfig {
                 .addFilterAfter(aclPermissionFilter, BearerTokenAuthenticationFilter.class)
                 .exceptionHandling(ex -> ex.accessDeniedHandler(new CustomAccessDeniedHandler()))
                 .build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of(
+                "http://localhost:3000",   // React dev server
+                "http://localhost:8800"    // Backend origin (for same-port serving)
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+        config.setExposedHeaders(List.of("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }

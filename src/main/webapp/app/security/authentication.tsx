@@ -103,6 +103,8 @@ export default function Authentication() {
         if (popup.location.href.indexOf(window.location.origin) === 0 &&
             searchParams.get('state') === randomState && searchParams.get('code')) {
           completeLogin(searchParams.get('provider')!, searchParams.get('code')!);
+          console.log(searchParams.get('provider')!)
+          console.log(searchParams.get('code')!)
         }
         popup.close();
         setRandomState(null);

@@ -5,10 +5,14 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.time.Instant;
+
+import io.security.base.users.Users;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,27 +32,40 @@ public class JwtTokenService {
     private final Algorithm rsa256;
     private final JWTVerifier verifier;
 
-    public JwtTokenService(@Value("classpath:certs/public.pem") final RSAPublicKey publicKey,
-            @Value("classpath:certs/private.pem") final RSAPrivateKey privateKey) {
+    public JwtTokenService(
+            @Value("classpath:certs/public.pem") final RSAPublicKey publicKey,
+            @Value("classpath:certs/private.pem") final RSAPrivateKey privateKey
+    ) {
         this.rsa256 = Algorithm.RSA256(publicKey, privateKey);
         this.verifier = JWT.require(this.rsa256).build();
     }
 
-    public String generateAccessToken(final UserDetails userDetails, final String loginType,
-            final Duration validity) {
+    public String generateAccessToken(
+            final Users userDetails,
+            final String loginType,
+            final Duration validity
+    ) {
         return generateToken(userDetails, loginType, TokenType.ACCESS, validity,
                 ACCESS_TOKEN_VALIDITY, MAX_ACCESS_TOKEN_VALIDITY);
     }
 
-    public String generateRefreshToken(final UserDetails userDetails, final String loginType,
-            final Duration validity) {
+    public String generateRefreshToken(
+            final Users userDetails,
+            final String loginType,
+            final Duration validity
+    ) {
         return generateToken(userDetails, loginType, TokenType.REFRESH, validity,
                 REFRESH_TOKEN_VALIDITY, MAX_REFRESH_TOKEN_VALIDITY);
     }
 
-    private String generateToken(final UserDetails userDetails, final String loginType,
-            final TokenType tokenType, final Duration validity, final Duration defaultValidity,
-            final Duration maxValidity) {
+    private String generateToken(
+            final Users userDetails,
+            final String loginType,
+            final TokenType tokenType,
+            final Duration validity,
+            final Duration defaultValidity,
+            final Duration maxValidity
+    ) {
         final Instant now = Instant.now();
         final Duration tokenValidity = validity == null ? defaultValidity
                 : (validity.compareTo(maxValidity) > 0 ? maxValidity : validity);
@@ -56,6 +73,7 @@ public class JwtTokenService {
                 .withSubject(userDetails.getUsername())
                 .withClaim("login_type", loginType)
                 .withClaim("token_type", tokenType.getValue())
+                .withClaim("token_version", userDetails.getTokenVersion())
                 // only for client information
                 .withArrayClaim("roles", userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
@@ -94,6 +112,7 @@ public class JwtTokenService {
         }
     }
 
+    @Getter
     private enum TokenType {
         ACCESS("access"),
         REFRESH("refresh");
@@ -104,9 +123,6 @@ public class JwtTokenService {
             this.value = value;
         }
 
-        public String getValue() {
-            return value;
-        }
     }
 
 }
