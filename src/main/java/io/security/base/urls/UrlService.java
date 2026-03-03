@@ -2,7 +2,6 @@ package io.security.base.urls;
 
 import io.security.base.events.BeforeDeletePrivilege;
 import io.security.base.util.NotFoundException;
-import io.security.base.util.ReferencedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -13,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UrlsService {
+public class UrlService {
 
     private final UrlsMapper urlsMapper;
     private final UrlsRepository urlsRepository;
 
-    public Page<UrlsDTO> findAll(final String filter, final Pageable pageable) {
-        Page<Urls> page;
+    public Page<UrlDTO> findAll(final String filter, final Pageable pageable) {
+        Page<Url> page;
         if (filter != null) {
             Long longFilter = null;
             try {
@@ -33,34 +32,38 @@ public class UrlsService {
         }
         return new PageImpl<>(page.getContent()
                 .stream()
-                .map(urls -> urlsMapper.mapToDTO(urls, new UrlsDTO()))
+                .map(urls -> urlsMapper.mapToDTO(urls, new UrlDTO()))
                 .toList(),
                 pageable, page.getTotalElements());
     }
 
-    public UrlsDTO get(final Long id) {
+    public UrlDTO get(final Long id) {
         return urlsRepository.findById(id)
-                .map(urls -> urlsMapper.mapToDTO(urls, new UrlsDTO()))
+                .map(urls -> urlsMapper.mapToDTO(urls, new UrlDTO()))
                 .orElseThrow(NotFoundException::new);
     }
 
-    public Long create(final UrlsDTO urlsDTO) {
-        final Urls urls = new Urls();
+    public Long create(final UrlDTO urlsDTO) {
+        final Url urls = new Url();
         urlsMapper.mapToEntity(urlsDTO, urls);
         return urlsRepository.save(urls).getId();
     }
 
-    public void update(final Long id, final UrlsDTO urlsDTO) {
-        final Urls urls = urlsRepository.findById(id)
+    public void update(final Long id, final UrlDTO urlsDTO) {
+        final Url urls = urlsRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         urlsMapper.mapToEntity(urlsDTO, urls);
         urlsRepository.save(urls);
     }
 
     public void delete(final Long id) {
-        final Urls urls = urlsRepository.findById(id)
+        final Url url = urlsRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
-        urlsRepository.delete(urls);
+
+        // Remove this URL from all privileges that reference it (owning side)
+        url.getPrivileges().forEach(privilege -> privilege.getUrls().remove(url));
+
+        urlsRepository.delete(url);
     }
 
 
@@ -70,13 +73,9 @@ public class UrlsService {
 
     @EventListener(BeforeDeletePrivilege.class)
     public void on(final BeforeDeletePrivilege event) {
-        final ReferencedException referencedException = new ReferencedException();
-        final Urls privilegeUrls = urlsRepository.findFirstByPrivilegeId(event.getId());
-        if (privilegeUrls != null) {
-            referencedException.setKey("privilege.urls.privilege.referenced");
-            referencedException.addParam(privilegeUrls.getId());
-            throw referencedException;
-        }
+        // remove many-to-many relations at owning side
+        urlsRepository.findAllByPrivilegeId(event.getId()).forEach(role ->
+                role.getPrivileges().removeIf(privilege -> privilege.getId().equals(event.getId())));
     }
 
 }

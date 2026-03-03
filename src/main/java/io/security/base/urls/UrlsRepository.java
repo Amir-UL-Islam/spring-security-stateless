@@ -3,13 +3,17 @@ package io.security.base.urls;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.Set;
 
 
-public interface UrlsRepository extends JpaRepository<Urls, Long> {
+public interface UrlsRepository extends JpaRepository<Url, Long> {
 
-    Page<Urls> findAllById(Long id, Pageable pageable);
+    Page<Url> findAllById(Long id, Pageable pageable);
 
-    Urls findFirstByPrivilegeId(Long id);
+    @Query("SELECT u FROM Url u JOIN u.privileges p WHERE p.id = :id")
+    Set<Url> findAllByPrivilegeId(Long id);
 
     boolean existsByEndpointIgnoreCase(String endpoint);
 

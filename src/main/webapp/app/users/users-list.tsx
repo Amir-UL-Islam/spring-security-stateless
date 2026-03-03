@@ -26,7 +26,7 @@ export default function UsersList() {
 
   const getAllUserses = async () => {
     try {
-      const response = await axios.get('/api/userss?' + listParams);
+      const response = await axios.get('/api/user?' + listParams);
       setUserses(response.data);
     } catch (error: any) {
       handleServerError(error, navigate);
@@ -38,8 +38,8 @@ export default function UsersList() {
       return;
     }
     try {
-      await axios.delete('/api/userss/' + id);
-      navigate('/userss', {
+      await axios.delete('/api/user/' + id);
+      navigate('/Users', {
             state: {
               msgInfo: t('users.delete.success')
             }
@@ -58,7 +58,7 @@ export default function UsersList() {
     <div className="d-flex flex-wrap mb-4">
       <h1 className="flex-grow-1">{t('users.list.headline')}</h1>
       <div>
-        <Link to="/userss/add" className="btn btn-primary ms-2">{t('users.list.createNew')}</Link>
+        <Link to="/Users/add" className="btn btn-primary ms-2">{t('users.list.createNew')}</Link>
       </div>
     </div>
     {((userses && userses.page.totalElements !== 0) || searchParams.get('filter')) && (
@@ -90,7 +90,7 @@ export default function UsersList() {
             <td>{users.username}</td>
             <td>
               <div className="float-end text-nowrap">
-                <Link to={'/userss/edit/' + users.id} className="btn btn-sm btn-secondary">{t('users.list.edit')}</Link>
+                <Link to={'/Users/edit/' + users.id} className="btn btn-sm btn-secondary">{t('users.list.edit')}</Link>
                 <span> </span>
                 <button type="button" onClick={() => confirmDelete(users.id!)} className="btn btn-sm btn-secondary">{t('users.list.delete')}</button>
               </div>

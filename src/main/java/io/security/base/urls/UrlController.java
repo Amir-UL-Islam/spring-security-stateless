@@ -1,13 +1,11 @@
 package io.security.base.urls;
 
 import io.security.base.privilege.PrivilegeService;
-import io.security.base.security.UserRoles;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import java.util.Map;
 import org.springframework.data.domain.Page;
@@ -17,7 +15,7 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,15 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping(value = "/api/urls", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/url", produces = MediaType.APPLICATION_JSON_VALUE)
 //@PreAuthorize("hasAuthority('" + UserRoles.ADMIN + "')")
 //@SecurityRequirement(name = "bearer-jwt")
-public class UrlsController {
+public class UrlController {
 
-    private final UrlsService urlsService;
+    private final UrlService urlsService;
     private final PrivilegeService privilegeService;
 
-    public UrlsController(final UrlsService urlsService, final PrivilegeService privilegeService) {
+    public UrlController(final UrlService urlsService, final PrivilegeService privilegeService) {
         this.urlsService = urlsService;
         this.privilegeService = privilegeService;
     }
@@ -63,34 +61,35 @@ public class UrlsController {
             }
     )
     @GetMapping
-    public ResponseEntity<Page<UrlsDTO>> getAllUrls(
+    @Transactional(readOnly = true)
+    public ResponseEntity<Page<UrlDTO>> getAllUrls(
             @RequestParam(name = "filter", required = false) final String filter,
             @Parameter(hidden = true) @SortDefault(sort = "id") @PageableDefault(size = 20) final Pageable pageable) {
         return ResponseEntity.ok(urlsService.findAll(filter, pageable));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UrlsDTO> getUrls(@PathVariable(name = "id") final Long id) {
+    public ResponseEntity<UrlDTO> getUrls(@PathVariable final Long id) {
         return ResponseEntity.ok(urlsService.get(id));
     }
 
     @PostMapping
     @ApiResponse(responseCode = "201")
-    public ResponseEntity<Long> createUrls(@RequestBody @Valid final UrlsDTO urlsDTO) {
+    public ResponseEntity<Long> createUrls(@RequestBody @Valid final UrlDTO urlsDTO) {
         final Long createdId = urlsService.create(urlsDTO);
         return new ResponseEntity<>(createdId, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Long> updateUrls(@PathVariable(name = "id") final Long id,
-            @RequestBody @Valid final UrlsDTO urlsDTO) {
+    public ResponseEntity<Long> updateUrls(@PathVariable final Long id,
+                                           @RequestBody @Valid final UrlDTO urlsDTO) {
         urlsService.update(id, urlsDTO);
         return ResponseEntity.ok(id);
     }
 
     @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204")
-    public ResponseEntity<Void> deleteUrls(@PathVariable(name = "id") final Long id) {
+    public ResponseEntity<Void> deleteUrls(@PathVariable final Long id) {
         urlsService.delete(id);
         return ResponseEntity.noContent().build();
     }

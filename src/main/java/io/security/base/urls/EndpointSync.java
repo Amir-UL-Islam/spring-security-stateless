@@ -53,11 +53,13 @@ public class EndpointSync implements ApplicationRunner {
                     if (urlsRepository.existsByEndpointIgnoreCaseAndMethodIgnoreCase(pattern, method)) {
                         continue;
                     }
-                    final Urls urls = new Urls();
-                    urls.setEndpoint(pattern);
-                    urls.setMethod(method);
-                    urls.setPrivilege(adminPrivilege);
-                    urlsRepository.save(urls);
+                    final Url url = new Url();
+                    url.setEndpoint(pattern);
+                    url.setMethod(method);
+                    adminPrivilege.getUrls().add(url);
+                    url.getPrivileges().add(adminPrivilege);
+                    urlsRepository.save(url);
+                    privilegeRepository.save(adminPrivilege);
                     log.info("Synced endpoint {} {}", method, pattern);
                 }
             }

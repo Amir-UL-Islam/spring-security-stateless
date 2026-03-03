@@ -60,13 +60,13 @@ public class UrlsLoader implements ApplicationRunner {
                 entry("/api/privileges", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
                 entry("/api/privileges/{id}", methods("GET", "PUT", "DELETE")),
 
-                entry("/api/urls", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
-                entry("/api/urls/privilegeValues", methods("GET")),
-                entry("/api/urls/{id}", methods("GET", "PUT", "DELETE")),
+                entry("/api/url", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/url/privilegeValues", methods("GET")),
+                entry("/api/url/{id}", methods("GET", "PUT", "DELETE")),
 
-                entry("/api/userss", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
-                entry("/api/userss/roleValues", methods("GET")),
-                entry("/api/userss/{id}", methods("GET", "PUT", "DELETE")),
+                entry("/api/user", methods("GET", "POST", "PUT", "PATCH", "DELETE")),
+                entry("/api/user/roleValues", methods("GET")),
+                entry("/api/user/{id}", methods("GET", "PUT", "DELETE")),
                 entry("/api/2fa/setup", methods("POST")),
                 entry("/api/2fa/activate", methods("POST")),
                 entry("/api/2fa/disable", methods("POST"))
@@ -77,8 +77,8 @@ public class UrlsLoader implements ApplicationRunner {
 
     private void seedUserUrls(final Privilege privilege) {
         Map<String, String[]> userEndpoints = Map.of(
-                "/api/userss", methods("GET"),
-                "/api/userss/{id}", methods("GET"),
+                "/api/user", methods("GET"),
+                "/api/user/{id}", methods("GET"),
                 "/api/2fa/setup", methods("POST"),
                 "/api/2fa/activate", methods("POST"),
                 "/api/2fa/disable", methods("POST")
@@ -88,11 +88,12 @@ public class UrlsLoader implements ApplicationRunner {
 
     private void addUrls(final String endpoint, final String[] methods, final Privilege privilege) {
         for (final String method : methods) {
-            final Urls urls = new Urls();
-            urls.setEndpoint(endpoint);
-            urls.setMethod(method);
-            urls.setPrivilege(privilege);
-            urlsRepository.save(urls);
+            final Url url = new Url();
+            url.setEndpoint(endpoint);
+            url.setMethod(method);
+            privilege.getUrls().add(url);
+            urlsRepository.save(url);           // persist Url first to get an ID
+            privilegeRepository.save(privilege);
         }
     }
 

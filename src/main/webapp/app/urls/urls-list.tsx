@@ -26,7 +26,7 @@ export default function UrlsList() {
 
   const getAllUrlses = async () => {
     try {
-      const response = await axios.get('/api/urls?' + listParams);
+      const response = await axios.get('/api/url?' + listParams);
       setUrlses(response.data);
     } catch (error: any) {
       handleServerError(error, navigate);
@@ -38,7 +38,7 @@ export default function UrlsList() {
       return;
     }
     try {
-      await axios.delete('/api/urls/' + id);
+      await axios.delete('/api/url/' + id);
       navigate('/urls', {
             state: {
               msgInfo: t('urls.delete.success')

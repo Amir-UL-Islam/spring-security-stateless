@@ -29,7 +29,7 @@ export default function Header() {
                 <button type="button" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" id="navbarEntitiesLink"
                     aria-expanded="false">{t('navigation.entities')}</button>
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarEntitiesLink">
-                  <li><Link to="/userss" className="dropdown-item">{t('users.list.headline')}</Link></li>
+                  <li><Link to="/Users" className="dropdown-item">{t('users.list.headline')}</Link></li>
                   <li><Link to="/roles" className="dropdown-item">{t('role.list.headline')}</Link></li>
                   <li><Link to="/privileges" className="dropdown-item">{t('privilege.list.headline')}</Link></li>
                   <li><Link to="/urls" className="dropdown-item">{t('urls.list.headline')}</Link></li>

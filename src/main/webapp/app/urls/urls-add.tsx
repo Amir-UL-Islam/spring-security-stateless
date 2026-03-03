@@ -40,7 +40,7 @@ export default function UrlsAdd() {
 
   const prepareRelations = async () => {
     try {
-      const privilegeValuesResponse = await axios.get('/api/urls/privilegeValues');
+      const privilegeValuesResponse = await axios.get('/api/url/privilegeValues');
       setPrivilegeValues(privilegeValuesResponse.data);
     } catch (error: any) {
       handleServerError(error, navigate);
@@ -54,7 +54,7 @@ export default function UrlsAdd() {
   const createUrls = async (data: UrlsDTO) => {
     window.scrollTo(0, 0);
     try {
-      await axios.post('/api/urls', data);
+      await axios.post('/api/url', data);
       navigate('/urls', {
             state: {
               msgSuccess: t('urls.create.success')

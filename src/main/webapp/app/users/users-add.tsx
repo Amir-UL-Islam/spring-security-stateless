@@ -42,7 +42,7 @@ export default function UsersAdd() {
 
   const prepareRelations = async () => {
     try {
-      const roleValuesResponse = await axios.get('/api/userss/roleValues');
+      const roleValuesResponse = await axios.get('/api/user/roleValues');
       setRoleValues(roleValuesResponse.data);
     } catch (error: any) {
       handleServerError(error, navigate);
@@ -56,8 +56,8 @@ export default function UsersAdd() {
   const createUsers = async (data: UsersDTO) => {
     window.scrollTo(0, 0);
     try {
-      await axios.post('/api/userss', data);
-      navigate('/userss', {
+      await axios.post('/api/user', data);
+      navigate('/Users', {
             state: {
               msgSuccess: t('users.create.success')
             }
@@ -71,7 +71,7 @@ export default function UsersAdd() {
     <div className="d-flex flex-wrap mb-4">
       <h1 className="flex-grow-1">{t('users.add.headline')}</h1>
       <div>
-        <Link to="/userss" className="btn btn-secondary">{t('users.add.back')}</Link>
+        <Link to="/Users" className="btn btn-secondary">{t('users.add.back')}</Link>
       </div>
     </div>
     <form onSubmit={useFormResult.handleSubmit(createUsers)} noValidate>

@@ -1,5 +1,6 @@
 package io.security.base.urls;
 
+import io.security.base.core.BaseEntity;
 import io.security.base.privilege.Privilege;
 import io.security.base.privilege.PrivilegeRepository;
 import io.security.base.util.NotFoundException;
@@ -11,20 +12,22 @@ import org.springframework.stereotype.Component;
 public class UrlsMapper {
     private final PrivilegeRepository privilegeRepository;
 
-    public UrlsDTO mapToDTO(final Urls urls, final UrlsDTO urlsDTO) {
+    public UrlDTO mapToDTO(final Url urls, final UrlDTO urlsDTO) {
         urlsDTO.setId(urls.getId());
         urlsDTO.setEndpoint(urls.getEndpoint());
         urlsDTO.setMethod(urls.getMethod());
-        urlsDTO.setPrivilege(urls.getPrivilege() == null ? null : urls.getPrivilege().getId());
+        urlsDTO.setPrivileges(urls.getPrivileges().stream().map(BaseEntity::getId).toList());
         return urlsDTO;
     }
 
-    public Urls mapToEntity(final UrlsDTO urlsDTO, final Urls urls) {
+    public Url mapToEntity(final UrlDTO urlsDTO, final Url urls) {
         urls.setEndpoint(urlsDTO.getEndpoint());
         urls.setMethod(urlsDTO.getMethod());
-        final Privilege privilege = urlsDTO.getPrivilege() == null ? null : privilegeRepository.findById(urlsDTO.getPrivilege())
-                .orElseThrow(() -> new NotFoundException("privilege not found"));
-        urls.setPrivilege(privilege);
+        urlsDTO.getPrivileges().forEach(id -> {
+            final Privilege privilege = privilegeRepository.findById(id)
+                    .orElseThrow(NotFoundException::new);
+            urls.getPrivileges().add(privilege);
+        });
         return urls;
     }
 }

@@ -84,4 +84,7 @@ public class UsersService {
                 users.getRole().removeIf(role -> role.getId().equals(event.getId())));
     }
 
+    public Users findByUsername(String name) {
+        return usersRepository.findByUsernameIgnoreCase(name);
+    }
 }

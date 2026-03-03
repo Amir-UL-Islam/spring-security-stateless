@@ -44,9 +44,9 @@ export default function UsersEdit() {
 
   const prepareForm = async () => {
     try {
-      const roleValuesResponse = await axios.get('/api/userss/roleValues');
+      const roleValuesResponse = await axios.get('/api/user/roleValues');
       setRoleValues(roleValuesResponse.data);
-      const data = (await axios.get('/api/userss/' + currentId)).data;
+      const data = (await axios.get('/api/user/' + currentId)).data;
       if (data.role) {
         data.role = JSON.stringify(data.role, undefined, 2);
       }
@@ -63,8 +63,8 @@ export default function UsersEdit() {
   const updateUsers = async (data: UsersDTO) => {
     window.scrollTo(0, 0);
     try {
-      await axios.put('/api/userss/' + currentId, data);
-      navigate('/userss', {
+      await axios.put('/api/user/' + currentId, data);
+      navigate('/Users', {
             state: {
               msgSuccess: t('users.update.success')
             }
@@ -78,7 +78,7 @@ export default function UsersEdit() {
     <div className="d-flex flex-wrap mb-4">
       <h1 className="flex-grow-1">{t('users.edit.headline')}</h1>
       <div>
-        <Link to="/userss" className="btn btn-secondary">{t('users.edit.back')}</Link>
+        <Link to="/Users" className="btn btn-secondary">{t('users.edit.back')}</Link>
       </div>
     </div>
     <form onSubmit={useFormResult.handleSubmit(updateUsers)} noValidate>

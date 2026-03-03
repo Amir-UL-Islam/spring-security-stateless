@@ -20,7 +20,7 @@ export default function Home() {
     <div className="col-md-4 mb-5">
       <h4 className="mb-3">{t('home.index.exploreEntities')}</h4>
       <div className="list-group">
-        <Link to="/userss" className="list-group-item list-group-item-action">{t('users.list.headline')}</Link>
+        <Link to="/Users" className="list-group-item list-group-item-action">{t('users.list.headline')}</Link>
         <Link to="/roles" className="list-group-item list-group-item-action">{t('role.list.headline')}</Link>
         <Link to="/privileges" className="list-group-item list-group-item-action">{t('privilege.list.headline')}</Link>
         <Link to="/urls" className="list-group-item list-group-item-action">{t('urls.list.headline')}</Link>

@@ -27,9 +27,9 @@ export default function AppRoutes() {
       element: <App />,
       children: [
         { path: '', element: <Home /> , handle: { roles: [ADMIN, USER] } },
-        { path: 'userss', element: <UsersList /> , handle: { roles: [ADMIN, USER] } },
-        { path: 'userss/add', element: <UsersAdd /> , handle: { roles: [ADMIN, USER] } },
-        { path: 'userss/edit/:id', element: <UsersEdit /> , handle: { roles: [ADMIN, USER] } },
+        { path: 'Users', element: <UsersList /> , handle: { roles: [ADMIN, USER] } },
+        { path: 'Users/add', element: <UsersAdd /> , handle: { roles: [ADMIN, USER] } },
+        { path: 'Users/edit/:id', element: <UsersEdit /> , handle: { roles: [ADMIN, USER] } },
         { path: 'roles', element: <RoleList /> , handle: { roles: [ADMIN] } },
         { path: 'roles/add', element: <RoleAdd /> , handle: { roles: [ADMIN] } },
         { path: 'roles/edit/:id', element: <RoleEdit /> , handle: { roles: [ADMIN] } },

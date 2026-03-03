@@ -36,10 +36,10 @@ public @interface UrlsEndpointUnique {
 
     class UrlsEndpointUniqueValidator implements ConstraintValidator<UrlsEndpointUnique, String> {
 
-        private final UrlsService urlsService;
+        private final UrlService urlsService;
         private final HttpServletRequest request;
 
-        public UrlsEndpointUniqueValidator(final UrlsService urlsService,
+        public UrlsEndpointUniqueValidator(final UrlService urlsService,
                 final HttpServletRequest request) {
             this.urlsService = urlsService;
             this.request = request;

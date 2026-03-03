@@ -42,9 +42,9 @@ export default function UrlsEdit() {
 
   const prepareForm = async () => {
     try {
-      const privilegeValuesResponse = await axios.get('/api/urls/privilegeValues');
+      const privilegeValuesResponse = await axios.get('/api/url/privilegeValues');
       setPrivilegeValues(privilegeValuesResponse.data);
-      const data = (await axios.get('/api/urls/' + currentId)).data;
+      const data = (await axios.get('/api/url/' + currentId)).data;
       useFormResult.reset(data);
     } catch (error: any) {
       handleServerError(error, navigate);
@@ -58,7 +58,7 @@ export default function UrlsEdit() {
   const updateUrls = async (data: UrlsDTO) => {
     window.scrollTo(0, 0);
     try {
-      await axios.put('/api/urls/' + currentId, data);
+      await axios.put('/api/url/' + currentId, data);
       navigate('/urls', {
             state: {
               msgSuccess: t('urls.update.success')

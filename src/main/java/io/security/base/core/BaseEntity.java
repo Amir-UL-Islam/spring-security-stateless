@@ -1,16 +1,7 @@
 package io.security.base.core;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.SequenceGenerator;
-
-import java.io.Serializable;
-import java.time.OffsetDateTime;
-
+import io.security.base.users.Users;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +10,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -42,14 +37,30 @@ public abstract class BaseEntity implements Serializable {
     private OffsetDateTime updateDate;
 
     @CreatedBy
-    @Column(name = "created_by", nullable = false)
-    private String createdBy;
+    @JoinColumn(name = "created_by_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private Users createdBy;
 
     @LastModifiedBy
-    @Column(name = "updated_by")
-    private String updatedBy;
+    @JoinColumn(name = "updated_by_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    private Users updatedBy;
 
     @Column(name = "uuid", unique = true)
     private String uuid;
+
+
+    @PrePersist
+    private void onBasePersist() {
+        if (this.uuid == null || this.uuid.isEmpty())
+            this.uuid = UUID.randomUUID().toString();
+    }
+
+    @PreUpdate
+    private void onBaseUpdate() {
+        if (this.uuid == null || this.uuid.isEmpty())
+            this.uuid = UUID.randomUUID().toString();
+    }
+
 }
 

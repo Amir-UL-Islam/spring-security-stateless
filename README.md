@@ -36,10 +36,10 @@ Stateless Security is a Spring Boot 4 + React (TypeScript) demo that shows how t
 
 ## API snapshot
 - Auth: `POST /authenticate`, `POST /authenticateGoogle`, `POST /register` (self-registration with hashed password).
-- Users: `GET/POST/PUT/DELETE /api/userss` with pagination and role lookups via `/api/userss/roleValues`.
+- Users: `GET/POST/PUT/DELETE /api/user` with pagination and role lookups via `/api/user/roleValues`.
 - Roles: `GET/POST/PUT/DELETE /api/roles`.
 - Privileges: `GET/POST/PUT/DELETE /api/privileges`.
-- URL rules: `GET/POST/PUT/DELETE /api/urlss` to map endpoints to required roles.
+- URL rules: `GET/POST/PUT/DELETE /api/urls` to map endpoints to required roles.
 - All `/api/**` routes require JWT bearer auth; method access is gated by `@PreAuthorize` with `ADMIN`/`USER` roles.
 
 ## Testing

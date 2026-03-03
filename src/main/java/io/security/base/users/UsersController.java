@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping(value = "/api/userss", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/user", produces = MediaType.APPLICATION_JSON_VALUE)
 //@PreAuthorize("hasAnyAuthority('" + UserRoles.ADMIN + "', '" + UserRoles.USER + "')")
 //@SecurityRequirement(name = "bearer-jwt")
 public class UsersController {
@@ -63,7 +63,7 @@ public class UsersController {
             }
     )
     @GetMapping
-    public ResponseEntity<Page<UsersDTO>> getAllUserss(
+    public ResponseEntity<Page<UsersDTO>> getAllUsers(
             @RequestParam(name = "filter", required = false) final String filter,
             @Parameter(hidden = true) @SortDefault(sort = "id") @PageableDefault(size = 20) final Pageable pageable) {
         return ResponseEntity.ok(usersService.findAll(filter, pageable));

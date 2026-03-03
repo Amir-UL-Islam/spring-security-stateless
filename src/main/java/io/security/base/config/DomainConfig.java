@@ -2,6 +2,9 @@ package io.security.base.config;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
+
+import io.security.base.users.Users;
+import io.security.base.users.UsersService;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +24,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider", auditorAwareRef = "auditorProvider")
 public class DomainConfig {
+    private final UsersService usersService;
+    public DomainConfig(final UsersService usersService) {
+        this.usersService = usersService;
+    }
 
     @Bean(name = "auditingDateTimeProvider")
     public DateTimeProvider dateTimeProvider() {
@@ -28,15 +35,15 @@ public class DomainConfig {
     }
 
     @Bean(name = "auditorProvider")
-    public AuditorAware<String> auditorProvider() {
+    public AuditorAware<Users> auditorProvider() {
         return () -> {
             final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null
                     || !authentication.isAuthenticated()
                     || authentication instanceof AnonymousAuthenticationToken) {
-                return Optional.of("system");
+                return Optional.empty();
             }
-            return Optional.ofNullable(authentication.getName()).filter(name -> !name.isBlank()).or(() -> Optional.of("system"));
+            return Optional.ofNullable(usersService.findByUsername(authentication.getName())).or(Optional::empty);
         };
     }
 
