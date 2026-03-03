@@ -12,21 +12,28 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
+
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public class Users extends BaseEntity {
+public class Users extends BaseEntity implements UserDetails {
     @Column
     private String name;
 
@@ -36,7 +43,7 @@ public class Users extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
-//    @Column(nullable = false)
+    //    @Column(nullable = false)
     private String password;
 
     @ManyToMany
@@ -53,4 +60,31 @@ public class Users extends BaseEntity {
     @Column
     private String totpSecret;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return role.stream()
+                .map(r -> new SimpleGrantedAuthority(r.getName()))
+                .toList();
+    }
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }

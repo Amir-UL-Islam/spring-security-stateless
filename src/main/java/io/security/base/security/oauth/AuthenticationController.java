@@ -1,7 +1,9 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.security.base.role.RoleRepository;
+import io.security.base.security.jwt.*;
+import io.security.base.security.two_fa.TwoFactorService;
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
 import jakarta.validation.Valid;

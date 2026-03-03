@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.two_fa;
 
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;

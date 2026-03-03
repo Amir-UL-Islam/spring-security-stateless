@@ -2,7 +2,7 @@ package io.security.base.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-import io.security.base.security.JwtUserDetailsService;
+import io.security.base.security.jwt.JwtUserDetailsService;
 import io.security.base.security.filters.ACLFilter;
 import io.security.base.security.interceptor.CustomAccessDeniedHandler;
 import java.security.interfaces.RSAPublicKey;

@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.two_fa;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import com.warrenstrange.googleauth.GoogleAuthenticatorConfig;

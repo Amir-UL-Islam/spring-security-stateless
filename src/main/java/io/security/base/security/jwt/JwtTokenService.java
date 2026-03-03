@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

@@ -24,10 +24,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableJpaAuditing(dateTimeProviderRef = "auditingDateTimeProvider", auditorAwareRef = "auditorProvider")
 public class DomainConfig {
-    private final UsersService usersService;
-    public DomainConfig(final UsersService usersService) {
-        this.usersService = usersService;
-    }
 
     @Bean(name = "auditingDateTimeProvider")
     public DateTimeProvider dateTimeProvider() {
@@ -35,15 +31,15 @@ public class DomainConfig {
     }
 
     @Bean(name = "auditorProvider")
-    public AuditorAware<Users> auditorProvider() {
+    public AuditorAware<String> auditorProvider() {
         return () -> {
             final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null
                     || !authentication.isAuthenticated()
                     || authentication instanceof AnonymousAuthenticationToken) {
-                return Optional.empty();
+                return Optional.of("system");
             }
-            return Optional.ofNullable(usersService.findByUsername(authentication.getName())).or(Optional::empty);
+            return Optional.ofNullable(authentication.getName()).filter(name -> !name.isBlank()).or(() -> Optional.of("system"));
         };
     }
 

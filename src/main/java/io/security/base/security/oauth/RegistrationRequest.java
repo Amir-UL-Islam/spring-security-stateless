@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 import io.security.base.users.UsersUsernameUnique;
 import jakarta.validation.constraints.NotNull;

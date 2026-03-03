@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

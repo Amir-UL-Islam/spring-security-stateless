@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.jwt;
 
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
@@ -12,17 +12,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class JwtUserDetailsService implements UserDetailsService {
+public class JwtSocialUserDetailsService implements UserDetailsService {
 
     private final UsersRepository usersRepository;
 
-    public JwtUserDetailsService(final UsersRepository usersRepository) {
+    public JwtSocialUserDetailsService(final UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
     @Override
     public JwtUserDetails loadUserByUsername(final String username) {
-        final Users users = usersRepository.findByUsernameIgnoreCase(username);
+        final Users users = usersRepository.findByEmail(username);
         if (users == null) {
             log.warn("user not found: {}", username);
             throw new UsernameNotFoundException("User " + username + " not found");
@@ -31,7 +31,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                 .stream()
                 .map(roleRef -> new SimpleGrantedAuthority(roleRef.getName()))
                 .toList();
-        return new JwtUserDetails(users.getId(), username, users.getPassword(), authorities);
+        return new JwtUserDetails(users.getId(), username, "", authorities);
     }
 
 }

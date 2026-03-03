@@ -1,10 +1,11 @@
-package io.security.base.security;
+package io.security.base.security.jwt;
 
 import io.security.base.users.Users;
 import io.security.base.users.UsersRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -12,17 +13,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class JwtSocialUserDetailsService implements UserDetailsService {
+public class JwtUserDetailsService implements UserDetailsService {
 
     private final UsersRepository usersRepository;
 
-    public JwtSocialUserDetailsService(final UsersRepository usersRepository) {
+    public JwtUserDetailsService(final UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
     @Override
     public JwtUserDetails loadUserByUsername(final String username) {
-        final Users users = usersRepository.findByEmail(username);
+        final Users users = usersRepository.findByUsernameIgnoreCase(username);
         if (users == null) {
             log.warn("user not found: {}", username);
             throw new UsernameNotFoundException("User " + username + " not found");
@@ -31,7 +32,6 @@ public class JwtSocialUserDetailsService implements UserDetailsService {
                 .stream()
                 .map(roleRef -> new SimpleGrantedAuthority(roleRef.getName()))
                 .toList();
-        return new JwtUserDetails(users.getId(), username, "", authorities);
+        return new JwtUserDetails(users.getId(), username, users.getPassword(), authorities);
     }
-
 }

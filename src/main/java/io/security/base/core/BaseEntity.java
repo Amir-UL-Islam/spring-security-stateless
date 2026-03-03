@@ -1,6 +1,5 @@
 package io.security.base.core;
 
-import io.security.base.users.Users;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -37,14 +36,12 @@ public abstract class BaseEntity implements Serializable {
     private OffsetDateTime updateDate;
 
     @CreatedBy
-    @JoinColumn(name = "created_by_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Users createdBy;
+    @Column(name = "created_by", nullable = false)
+    private String createdBy;
 
     @LastModifiedBy
-    @JoinColumn(name = "updated_by_id")
-    @OneToOne(fetch = FetchType.LAZY)
-    private Users updatedBy;
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     @Column(name = "uuid", unique = true)
     private String uuid;

@@ -1,7 +1,7 @@
 package io.security.base.security.filters;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.security.base.security.JwtTokenService;
+import io.security.base.security.jwt.JwtTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

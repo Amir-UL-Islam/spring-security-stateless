@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

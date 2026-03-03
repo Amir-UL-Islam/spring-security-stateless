@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 
 public class UserRoles {

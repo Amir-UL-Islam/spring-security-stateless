@@ -1,4 +1,4 @@
-package io.security.base.security;
+package io.security.base.security.oauth;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -7,9 +7,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RefreshTokenRequest {
+public class AuthenticationSocialRequest {
 
     @NotNull
-    private String refreshToken;
+    private String code;
 
 }
