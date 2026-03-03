@@ -89,6 +89,7 @@ public class UrlController {
 
     @DeleteMapping("/{id}")
     @ApiResponse(responseCode = "204")
+    @Transactional
     public ResponseEntity<Void> deleteUrls(@PathVariable final Long id) {
         urlsService.delete(id);
         return ResponseEntity.noContent().build();
