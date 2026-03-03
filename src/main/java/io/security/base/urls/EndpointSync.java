@@ -4,10 +4,9 @@ import io.security.base.privilege.Privilege;
 import io.security.base.privilege.PrivilegeRepository;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +16,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @Component
 @Transactional
 @Order(4)
-public class EndpointSync implements ApplicationListener<ContextRefreshedEvent> {
+@Slf4j
+public class EndpointSync implements ApplicationRunner {
 
-    private static final Logger log = LoggerFactory.getLogger(EndpointSync.class);
     private final RequestMappingHandlerMapping handlerMapping;
     private final UrlsRepository urlsRepository;
     private final PrivilegeRepository privilegeRepository;
@@ -33,7 +32,7 @@ public class EndpointSync implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     @Override
-    public void onApplicationEvent(final ContextRefreshedEvent event) {
+    public void run(final ApplicationArguments args) {
         final Privilege adminPrivilege = privilegeRepository.findByNameIgnoreCase("ADMIN")
                 .orElse(null);
         if (adminPrivilege == null) {
