@@ -7,7 +7,10 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+
 import java.util.Map;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -73,6 +76,12 @@ public class UrlController {
         return ResponseEntity.ok(urlsService.get(id));
     }
 
+    @GetMapping("/privilege/{id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<Set<UrlDTO>> getByPrivilegeId(@PathVariable final Long id) {
+        return ResponseEntity.ok(urlsService.getByPrivilege(id));
+    }
+
     @PostMapping
     @ApiResponse(responseCode = "201")
     public ResponseEntity<Long> createUrls(@RequestBody @Valid final UrlDTO urlsDTO) {
@@ -88,7 +97,7 @@ public class UrlController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiResponse(  responseCode = "204")
+    @ApiResponse(responseCode = "204")
     @Transactional
     public ResponseEntity<Void> deleteUrls(@PathVariable final Long id) {
         urlsService.delete(id);

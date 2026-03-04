@@ -1,13 +1,12 @@
 package io.security.base.privilege;
 
 import io.security.base.events.BeforeDeletePrivilege;
+import io.security.base.urls.Url;
+import io.security.base.urls.UrlsRepository;
 import io.security.base.util.CustomCollectors;
 import io.security.base.util.NotFoundException;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,11 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PrivilegeService {
 
+    private final UrlsRepository urlsRepository;
     private final PrivilegeMapper privilegeMapper;
     private final PrivilegeRepository privilegeRepository;
     private final ApplicationEventPublisher publisher;
-
-
 
 
     public List<PrivilegeDTO> findAll() {
@@ -73,6 +71,24 @@ public class PrivilegeService {
         return privilegeRepository.findAll(Sort.by("id"))
                 .stream()
                 .collect(CustomCollectors.toSortedMap(Privilege::getId, Privilege::getName));
+    }
+
+    public void assignUrl(Long privilegeId, Long urlId) {
+        Privilege privilege = privilegeRepository.findById(privilegeId).orElseThrow();
+        Url url = urlsRepository.findById(urlId).orElseThrow();
+
+        privilege.getUrls().add(url);
+        urlsRepository.save(url);           // persist Url first to get an ID
+        privilegeRepository.save(privilege);
+    }
+
+    public void removeAssignUrl(Long privilegeId, Long urlId) {
+        Privilege privilege = privilegeRepository.findById(privilegeId).orElseThrow();
+        Url url = urlsRepository.findById(urlId).orElseThrow();
+
+        privilege.getUrls().remove(url);
+        urlsRepository.save(url);           // persist Url first to get an ID
+        privilegeRepository.save(privilege);
     }
 
     public boolean hasPermission(Authentication authentication, HttpServletRequest request) {
